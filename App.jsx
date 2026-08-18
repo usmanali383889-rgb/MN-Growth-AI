@@ -600,7 +600,34 @@ function Topbar({ title, mode, setMode, collapsed, setCollapsed, session, onLogo
 
 /* ---------------------------------- SECTIONS ---------------------------------- */
 
-function DashboardSection({ onNewCampaign, businessName }) {
+function DashboardSection({ onNewCampaign, businessName, businessId }) {
+  const isDefaultBusiness = businessId === DEFAULT_BUSINESSES[0].id;
+
+  // For the original showcase business, keep the rich demo visuals.
+  // For every other (real) business, compute actual numbers from what's stored — starting at 0.
+  const realCustomers = lsGet(bKey("mnft_customers", businessId), []);
+  const realCoupons = lsGet(bKey("mnft_coupons", businessId), []);
+  const realCampaigns = lsGet(bKey("mnft_campaigns", businessId), []);
+  const realReviews = lsGet(bKey("mnft_reviews", businessId), []);
+
+  const newCustomers = realCustomers.filter((c) => c.tag === "New").length;
+  const returningCustomers = realCustomers.filter((c) => c.tag === "Loyal" || c.tag === "VIP" || (c.visits || 0) > 1).length;
+  const revenueFromCustomers = realCustomers.reduce((sum, c) => sum + (parseInt(String(c.spend || "0").replace(/[^\d]/g, ""), 10) || 0), 0);
+  const avgRating = realReviews.length ? (realReviews.reduce((s, r) => s + (r.rating || 0), 0) / realReviews.length).toFixed(1) : "—";
+  const couponUses = realCoupons.reduce((sum, c) => sum + (parseInt(String(c.used || "0").split("/")[0].replace(/[^\d]/g, ""), 10) || 0), 0);
+
+  const liveKpis = [
+    { label: "Total Customers", value: realCustomers.length.toLocaleString(), delta: "", up: true, icon: Users },
+    { label: "New Customers", value: newCustomers.toLocaleString(), delta: "", up: true, icon: Sparkles },
+    { label: "Returning Customers", value: returningCustomers.toLocaleString(), delta: "", up: true, icon: RefreshCw },
+    { label: "Revenue from Promotions", value: `₦${revenueFromCustomers.toLocaleString()}`, delta: "", up: true, icon: TrendingUp },
+    { label: "Google Review Growth", value: avgRating === "—" ? "—" : `${avgRating} ★`, delta: "", up: true, icon: Star },
+    { label: "Coupon Usage", value: couponUses.toLocaleString(), delta: "", up: true, icon: Ticket },
+  ];
+
+  const displayKpis = isDefaultBusiness ? kpis : liveKpis;
+  const hasAnyData = realCustomers.length || realCoupons.length || realCampaigns.length || realReviews.length;
+
   return (
     <div className="fade-in">
       <SectionHeader
@@ -615,110 +642,136 @@ function DashboardSection({ onNewCampaign, businessName }) {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-        {kpis.map((k) => <KpiCard key={k.label} k={k} />)}
+        {displayKpis.map((k) => <KpiCard key={k.label} k={k} />)}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-        <div className="card p-6 lg:col-span-2">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-display text-lg">Customer Growth</h3>
-            <div className="flex gap-4 text-xs font-mono">
-              <span className="inline-flex items-center gap-1.5" style={{ color: "var(--accent)" }}><span className="w-2 h-2 rounded-full" style={{ background: "var(--accent)" }} />New + Total</span>
-              <span className="inline-flex items-center gap-1.5" style={{ color: "var(--gold)" }}><span className="w-2 h-2 rounded-full" style={{ background: "var(--gold)" }} />Returning</span>
+      {!isDefaultBusiness && !hasAnyData ? (
+        <div className="card p-10 text-center">
+          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "var(--surface-2)" }}>
+            <Sparkles size={22} style={{ color: "var(--muted)" }} />
+          </div>
+          <h3 className="font-display text-lg mb-1" style={{ color: "var(--text)" }}>This restaurant is brand new</h3>
+          <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--muted)" }}>
+            Charts and activity will appear here once you add customers, run campaigns, or collect reviews for {businessName}.
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+            <div className="card p-6 lg:col-span-2">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="font-display text-lg">Customer Growth</h3>
+                <div className="flex gap-4 text-xs font-mono">
+                  <span className="inline-flex items-center gap-1.5" style={{ color: "var(--accent)" }}><span className="w-2 h-2 rounded-full" style={{ background: "var(--accent)" }} />New + Total</span>
+                  <span className="inline-flex items-center gap-1.5" style={{ color: "var(--gold)" }}><span className="w-2 h-2 rounded-full" style={{ background: "var(--gold)" }} />Returning</span>
+                </div>
+              </div>
+              <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Last 6 months, all branches combined</p>
+              <div style={{ height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={isDefaultBusiness ? growthSeries : [{ m: "Now", customers: realCustomers.length, returning: returningCustomers }]} margin={{ left: -20, right: 10, top: 10 }}>
+                    <defs>
+                      <linearGradient id="gCust" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.35} />
+                        <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="gRet" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--gold)" stopOpacity={0.3} />
+                        <stop offset="100%" stopColor="var(--gold)" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="m" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Area type="monotone" dataKey="customers" name="Customers" stroke="var(--accent)" fill="url(#gCust)" strokeWidth={2.5} />
+                    <Area type="monotone" dataKey="returning" name="Returning" stroke="var(--gold)" fill="url(#gRet)" strokeWidth={2.5} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="card p-6">
+              <h3 className="font-display text-lg mb-1">Promotion Revenue Mix</h3>
+              <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Share of revenue by promo type</p>
+              {isDefaultBusiness ? (
+                <>
+                  <div style={{ height: 190 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={revenueMix} dataKey="value" nameKey="name" innerRadius={52} outerRadius={80} paddingAngle={3}>
+                          {revenueMix.map((e, i) => <Cell key={i} fill={e.color} stroke="var(--surface)" strokeWidth={2} />)}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip suffix="%" />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="space-y-2 mt-2">
+                    {revenueMix.map((e) => (
+                      <div key={e.name} className="flex items-center justify-between text-xs">
+                        <span className="inline-flex items-center gap-2" style={{ color: "var(--text-dim)" }}>
+                          <span className="w-2 h-2 rounded-full" style={{ background: e.color }} />{e.name}
+                        </span>
+                        <span className="font-mono" style={{ color: "var(--text)" }}>{e.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="h-[190px] flex items-center justify-center text-xs text-center px-6" style={{ color: "var(--muted)" }}>
+                  Not enough promotion data yet to show a mix.
+                </div>
+              )}
             </div>
           </div>
-          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Last 6 months, all branches combined</p>
-          <div style={{ height: 260 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={growthSeries} margin={{ left: -20, right: 10, top: 10 }}>
-                <defs>
-                  <linearGradient id="gCust" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="gRet" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--gold)" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="var(--gold)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="m" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="customers" name="Customers" stroke="var(--accent)" fill="url(#gCust)" strokeWidth={2.5} />
-                <Area type="monotone" dataKey="returning" name="Returning" stroke="var(--gold)" fill="url(#gRet)" strokeWidth={2.5} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
 
-        <div className="card p-6">
-          <h3 className="font-display text-lg mb-1">Promotion Revenue Mix</h3>
-          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Share of revenue by promo type</p>
-          <div style={{ height: 190 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={revenueMix} dataKey="value" nameKey="name" innerRadius={52} outerRadius={80} paddingAngle={3}>
-                  {revenueMix.map((e, i) => <Cell key={i} fill={e.color} stroke="var(--surface)" strokeWidth={2} />)}
-                </Pie>
-                <Tooltip content={<CustomTooltip suffix="%" />} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="space-y-2 mt-2">
-            {revenueMix.map((e) => (
-              <div key={e.name} className="flex items-center justify-between text-xs">
-                <span className="inline-flex items-center gap-2" style={{ color: "var(--text-dim)" }}>
-                  <span className="w-2 h-2 rounded-full" style={{ background: e.color }} />{e.name}
-                </span>
-                <span className="font-mono" style={{ color: "var(--text)" }}>{e.value}%</span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="card p-6 lg:col-span-2">
+              <h3 className="font-display text-lg mb-1">Campaign Performance</h3>
+              <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Sent vs. converted, by channel</p>
+              <div style={{ height: 230 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={isDefaultBusiness ? campaignPerf : realCampaigns.map((c) => ({ name: c.channel, sent: c.sent || 0, converted: 0 }))} margin={{ left: -20, right: 10 }}>
+                    <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--surface-2)" }} />
+                    <Bar dataKey="sent" name="Sent" fill="var(--surface-3)" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="converted" name="Converted" fill="var(--accent)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
+            </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div className="card p-6 lg:col-span-2">
-          <h3 className="font-display text-lg mb-1">Campaign Performance</h3>
-          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Sent vs. converted, by channel</p>
-          <div style={{ height: 230 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={campaignPerf} margin={{ left: -20, right: 10 }}>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--surface-2)" }} />
-                <Bar dataKey="sent" name="Sent" fill="var(--surface-3)" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="converted" name="Converted" fill="var(--accent)" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="card p-6">
-          <h3 className="font-display text-lg mb-4">Live Activity</h3>
-          <div className="space-y-4 mnft-scroll" style={{ maxHeight: 230, overflowY: "auto" }}>
-            {activity.map((a, i) => {
-              const Icon = a.icon;
-              return (
-                <div key={i} className="flex items-start gap-3">
-                  <div
-                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ background: `var(--${a.tone}-soft)`, color: `var(--${a.tone})` }}
-                  >
-                    <Icon size={13} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs leading-snug" style={{ color: "var(--text-dim)" }}>{a.text}</p>
-                    <span className="text-[10px] font-mono" style={{ color: "var(--muted)" }}>{a.time}</span>
-                  </div>
+            <div className="card p-6">
+              <h3 className="font-display text-lg mb-4">Live Activity</h3>
+              {isDefaultBusiness ? (
+                <div className="space-y-4 mnft-scroll" style={{ maxHeight: 230, overflowY: "auto" }}>
+                  {activity.map((a, i) => {
+                    const Icon = a.icon;
+                    return (
+                      <div key={i} className="flex items-start gap-3">
+                        <div
+                          className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+                          style={{ background: `var(--${a.tone}-soft)`, color: `var(--${a.tone})` }}
+                        >
+                          <Icon size={13} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs leading-snug" style={{ color: "var(--text-dim)" }}>{a.text}</p>
+                          <span className="text-[10px] font-mono" style={{ color: "var(--muted)" }}>{a.time}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
+              ) : (
+                <p className="text-xs" style={{ color: "var(--muted)" }}>No activity yet — add customers or send a campaign to see it here.</p>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
@@ -2119,16 +2172,31 @@ function ReferralsSection({ businessId }) {
   );
 }
 
-function AnalyticsSection() {
+function AnalyticsSection({ businessId, businessName }) {
+  const isDefaultBusiness = businessId === DEFAULT_BUSINESSES[0].id;
+  const realCustomers = lsGet(bKey("mnft_customers", businessId), []);
+  const realCoupons = lsGet(bKey("mnft_coupons", businessId), []);
+  const returningCustomers = realCustomers.filter((c) => c.tag === "Loyal" || c.tag === "VIP" || (c.visits || 0) > 1).length;
+  const repeatRate = realCustomers.length ? Math.round((returningCustomers / realCustomers.length) * 100) : 0;
+
   const conv = [
     { m: "Feb", rate: 3.1 }, { m: "Mar", rate: 3.4 }, { m: "Apr", rate: 3.8 },
     { m: "May", rate: 4.2 }, { m: "Jun", rate: 4.6 }, { m: "Jul", rate: 5.1 },
   ];
-  const roiCards = [
-    { label: "Marketing ROI", value: "4.6x", note: "₦1 spent → ₦4.60 generated" },
-    { label: "Repeat Customer Rate", value: "62%", note: "Up from 54% last quarter" },
-    { label: "Avg. Conversion Rate", value: "5.1%", note: "Across all campaigns" },
-  ];
+  const roiCards = isDefaultBusiness
+    ? [
+        { label: "Marketing ROI", value: "4.6x", note: "₦1 spent → ₦4.60 generated" },
+        { label: "Repeat Customer Rate", value: "62%", note: "Up from 54% last quarter" },
+        { label: "Avg. Conversion Rate", value: "5.1%", note: "Across all campaigns" },
+      ]
+    : [
+        { label: "Marketing ROI", value: "—", note: "Needs campaign + revenue data" },
+        { label: "Repeat Customer Rate", value: `${repeatRate}%`, note: `${returningCustomers} of ${realCustomers.length} customers` },
+        { label: "Coupons Redeemed", value: realCoupons.length.toLocaleString(), note: "Total coupons created so far" },
+      ];
+
+  const hasAnyData = realCustomers.length || realCoupons.length;
+
   return (
     <div className="fade-in">
       <SectionHeader
@@ -2147,39 +2215,52 @@ function AnalyticsSection() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="card p-6">
-          <h3 className="font-display text-lg mb-1">Conversion Rate Trend</h3>
-          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Visitors → paying customers</p>
-          <div style={{ height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={conv} margin={{ left: -20, right: 10 }}>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="m" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} unit="%" />
-                <Tooltip content={<CustomTooltip suffix="%" />} />
-                <Line type="monotone" dataKey="rate" name="Conversion" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 3 }} />
-              </LineChart>
-            </ResponsiveContainer>
+      {!isDefaultBusiness && !hasAnyData ? (
+        <div className="card p-10 text-center">
+          <BarChart3 size={22} className="mx-auto mb-3" style={{ color: "var(--muted)" }} />
+          <p className="text-sm max-w-sm mx-auto" style={{ color: "var(--muted)" }}>
+            Charts will appear here once {businessName} has customers, campaigns, or coupon activity to analyze.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <div className="card p-6">
+            <h3 className="font-display text-lg mb-1">Conversion Rate Trend</h3>
+            <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Visitors → paying customers</p>
+            {isDefaultBusiness ? (
+              <div style={{ height: 220 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={conv} margin={{ left: -20, right: 10 }}>
+                    <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
+                    <XAxis dataKey="m" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} unit="%" />
+                    <Tooltip content={<CustomTooltip suffix="%" />} />
+                    <Line type="monotone" dataKey="rate" name="Conversion" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 3 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="h-[220px] flex items-center justify-center text-xs" style={{ color: "var(--muted)" }}>Not enough data yet</div>
+            )}
+          </div>
+          <div className="card p-6">
+            <h3 className="font-display text-lg mb-1">Sales Growth</h3>
+            <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Total vs. returning customers, 6 months</p>
+            <div style={{ height: 220 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={isDefaultBusiness ? growthSeries : [{ m: "Now", customers: realCustomers.length, returning: returningCustomers }]} margin={{ left: -20, right: 10 }}>
+                  <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="m" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--surface-2)" }} />
+                  <Bar dataKey="customers" name="Total" fill="var(--surface-3)" radius={[6,6,0,0]} />
+                  <Bar dataKey="returning" name="Returning" fill="var(--gold)" radius={[6,6,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
-        <div className="card p-6">
-          <h3 className="font-display text-lg mb-1">Sales Growth</h3>
-          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Total vs. returning customers, 6 months</p>
-          <div style={{ height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={growthSeries} margin={{ left: -20, right: 10 }}>
-                <CartesianGrid strokeDasharray="3 6" stroke="var(--border)" vertical={false} />
-                <XAxis dataKey="m" tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "var(--muted)", fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--surface-2)" }} />
-                <Bar dataKey="customers" name="Total" fill="var(--surface-3)" radius={[6,6,0,0]} />
-                <Bar dataKey="returning" name="Returning" fill="var(--gold)" radius={[6,6,0,0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -3759,7 +3840,7 @@ export default function App() {
   const activeBusiness = businesses.find((b) => b.id === businessId) || businesses[0];
 
   const sections = {
-    dashboard: <DashboardSection onNewCampaign={() => setActive("campaigns")} businessName={activeBusiness.name} />,
+    dashboard: <DashboardSection onNewCampaign={() => setActive("campaigns")} businessName={activeBusiness.name} businessId={businessId} />,
     "ai-marketing": <AiMarketingSection businessName={activeBusiness.name} businessId={businessId} />,
     campaigns: <CampaignsSection businessId={businessId} />,
     automations: <AutomationsSection businessId={businessId} businessName={activeBusiness.name} />,
@@ -3769,7 +3850,7 @@ export default function App() {
     reviews: <ReviewsSection businessId={businessId} businessName={activeBusiness.name} />,
     referrals: <ReferralsSection businessId={businessId} />,
     "digital-menu": <DigitalMenuSection businessId={businessId} businessName={activeBusiness.name} />,
-    analytics: <AnalyticsSection />,
+    analytics: <AnalyticsSection businessId={businessId} businessName={activeBusiness.name} />,
     assistant: <AssistantSection businessId={businessId} businessName={activeBusiness.name} />,
     notifications: <NotificationsSection businessId={businessId} />,
     reports: <ReportsSection />,
