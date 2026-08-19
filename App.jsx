@@ -19,7 +19,7 @@ import {
 function toWaNumber(raw) {
   if (!raw) return "";
   let digits = String(raw).replace(/[^\d]/g, "");
-  if (digits.startsWith("0")) digits = "234" + digits.slice(1); // default local -> NG country code
+  if (digits.startsWith("0")) digits = "92" + digits.slice(1); // default local -> PK country code
   return digits;
 }
 function waLink(phone, message) {
@@ -197,18 +197,18 @@ const kpis = [
   { label: "Total Customers", value: "8,412", delta: "+12.4%", up: true, icon: Users },
   { label: "New Customers", value: "612", delta: "+8.1%", up: true, icon: Sparkles },
   { label: "Returning Customers", value: "1,080", delta: "+6.9%", up: true, icon: RefreshCw },
-  { label: "Revenue from Promotions", value: "₦4.82M", delta: "+18.3%", up: true, icon: TrendingUp },
+  { label: "Revenue from Promotions", value: "Rs 4.82M", delta: "+18.3%", up: true, icon: TrendingUp },
   { label: "Google Review Growth", value: "4.8 ★", delta: "+0.3", up: true, icon: Star },
   { label: "Coupon Usage", value: "1,904", delta: "-3.2%", up: false, icon: Ticket },
 ];
 
 const customers = [
-  { name: "Amara Okafor", phone: "2348031112223", tag: "VIP", segment: "Frequent Buyer", spend: "₦186,200", visits: 24, birthday: "Aug 14", fav: "Iced Latte" },
-  { name: "Tunde Bello", phone: "2348022234455", tag: "New", segment: "First Purchase", spend: "₦8,500", visits: 1, birthday: "Nov 02", fav: "—" },
-  { name: "Chiamaka Eze", phone: "2348033345566", tag: "Loyal", segment: "Monthly Regular", spend: "₦94,000", visits: 15, birthday: "Aug 03", fav: "Jollof Combo" },
-  { name: "Ifeoma Nwosu", phone: "2348044456677", tag: "At Risk", segment: "Lapsing", spend: "₦52,300", visits: 6, birthday: "Jan 27", fav: "Suya Wrap" },
-  { name: "David Okon", phone: "2348055567788", tag: "VIP", segment: "Frequent Buyer", spend: "₦241,900", visits: 31, birthday: "Aug 22", fav: "Espresso" },
-  { name: "Blessing Umeh", phone: "2348066678899", tag: "Loyal", segment: "Monthly Regular", spend: "₦71,400", visits: 12, birthday: "May 09", fav: "Smoothie Bowl" },
+  { name: "Amara Okafor", phone: "923001112223", tag: "VIP", segment: "Frequent Buyer", spend: "Rs 186,200", visits: 24, birthday: "Aug 14", fav: "Iced Latte" },
+  { name: "Tunde Bello", phone: "923012234455", tag: "New", segment: "First Purchase", spend: "Rs 8,500", visits: 1, birthday: "Nov 02", fav: "—" },
+  { name: "Chiamaka Eze", phone: "923023345566", tag: "Loyal", segment: "Monthly Regular", spend: "Rs 94,000", visits: 15, birthday: "Aug 03", fav: "Jollof Combo" },
+  { name: "Ifeoma Nwosu", phone: "923034456677", tag: "At Risk", segment: "Lapsing", spend: "Rs 52,300", visits: 6, birthday: "Jan 27", fav: "Suya Wrap" },
+  { name: "David Okon", phone: "923045567788", tag: "VIP", segment: "Frequent Buyer", spend: "Rs 241,900", visits: 31, birthday: "Aug 22", fav: "Espresso" },
+  { name: "Blessing Umeh", phone: "923056678899", tag: "Loyal", segment: "Monthly Regular", spend: "Rs 71,400", visits: 12, birthday: "May 09", fav: "Smoothie Bowl" },
 ];
 
 const campaignsList = [
@@ -234,10 +234,10 @@ const reviewsList = [
 ];
 
 const referralLeaders = [
-  { name: "Amara Okafor", invites: 18, rewardEarned: "₦18,000" },
-  { name: "David Okon", invites: 14, rewardEarned: "₦14,000" },
-  { name: "Chiamaka Eze", invites: 11, rewardEarned: "₦11,000" },
-  { name: "Blessing Umeh", invites: 9, rewardEarned: "₦9,000" },
+  { name: "Amara Okafor", invites: 18, rewardEarned: "Rs 18,000" },
+  { name: "David Okon", invites: 14, rewardEarned: "Rs 14,000" },
+  { name: "Chiamaka Eze", invites: 11, rewardEarned: "Rs 11,000" },
+  { name: "Blessing Umeh", invites: 9, rewardEarned: "Rs 9,000" },
 ];
 
 const reports = [
@@ -620,7 +620,7 @@ function DashboardSection({ onNewCampaign, businessName, businessId }) {
     { label: "Total Customers", value: realCustomers.length.toLocaleString(), delta: "", up: true, icon: Users },
     { label: "New Customers", value: newCustomers.toLocaleString(), delta: "", up: true, icon: Sparkles },
     { label: "Returning Customers", value: returningCustomers.toLocaleString(), delta: "", up: true, icon: RefreshCw },
-    { label: "Revenue from Promotions", value: `₦${revenueFromCustomers.toLocaleString()}`, delta: "", up: true, icon: TrendingUp },
+    { label: "Revenue from Promotions", value: `Rs ${revenueFromCustomers.toLocaleString()}`, delta: "", up: true, icon: TrendingUp },
     { label: "Google Review Growth", value: avgRating === "—" ? "—" : `${avgRating} ★`, delta: "", up: true, icon: Star },
     { label: "Coupon Usage", value: couponUses.toLocaleString(), delta: "", up: true, icon: Ticket },
   ];
@@ -805,13 +805,28 @@ function bestTimeFor(cityIndex, platform, tz) {
 // Turn the promo's keywords into a real, relevant background photo instead of a plain color block.
 function detectImageCategory(text) {
   const t = (text || "").toLowerCase();
-  if (/coffee|latte|espresso|cappuccino|tea\b/.test(t)) return "coffee,cafe";
-  if (/burger|fries|fast\s?food/.test(t)) return "burger,fastfood";
-  if (/pizza/.test(t)) return "pizza";
-  if (/dessert|cake|pastry|sweet|ice\s?cream|bakery/.test(t)) return "dessert,bakery";
-  if (/smoothie|juice|drink|cocktail|shake/.test(t)) return "smoothie,drink";
-  if (/biryani|karahi|bbq|kebab|grill/.test(t)) return "grill,bbq";
-  if (/sushi/.test(t)) return "sushi";
+  const rules = [
+    { re: /coffee|latte|espresso|cappuccino|mocha/, cat: "coffee,cafe" },
+    { re: /\btea\b|chai/, cat: "tea,cup" },
+    { re: /burger|fries|fast\s?food/, cat: "burger,fastfood" },
+    { re: /pizza/, cat: "pizza" },
+    { re: /dessert|cake|pastry|sweet|ice\s?cream|bakery|donut|cupcake/, cat: "dessert,bakery" },
+    { re: /smoothie|juice|cocktail|shake|milkshake/, cat: "smoothie,drink" },
+    { re: /\bdrink\b|beverage/, cat: "drink,beverage" },
+    { re: /biryani|karahi|bbq|kebab|grill|tikka|roast/, cat: "grill,bbq" },
+    { re: /sushi/, cat: "sushi" },
+    { re: /pasta|noodle|spaghetti/, cat: "pasta,noodles" },
+    { re: /steak/, cat: "steak" },
+    { re: /salad/, cat: "salad,healthyfood" },
+    { re: /sandwich|wrap/, cat: "sandwich" },
+    { re: /breakfast|brunch/, cat: "breakfast,brunch" },
+    { re: /seafood|fish|shrimp|prawn/, cat: "seafood" },
+    { re: /chicken/, cat: "chicken,food" },
+    { re: /fried\s?rice|biryani|rice\b/, cat: "rice,food" },
+    { re: /wine|beer|bar\b/, cat: "bar,drinks" },
+    { re: /happy\s?hour/, cat: "restaurant,bar" },
+  ];
+  for (const r of rules) if (r.re.test(t)) return r.cat;
   return "restaurant,food";
 }
 
@@ -819,7 +834,7 @@ function detectImageCategory(text) {
 function parsePromoPrompt(text) {
   const raw = (text || "").trim();
   const percentMatch = raw.match(/(\d{1,3})\s?%/);
-  const amountMatch = raw.match(/(₦|\$|£|€)\s?([\d,]+)/);
+  const amountMatch = raw.match(/(Rs |\$|£|€)\s?([\d,]+)/);
   const bogo = /\bbogo\b|buy\s?1\s?get\s?1|buy one get one/i.test(raw);
   const flash = /flash sale|today only|few hours|limited time/i.test(raw);
   const freeMatch = raw.match(/free\s+([a-zA-Z ]{2,20})/i);
@@ -834,7 +849,7 @@ function parsePromoPrompt(text) {
   // Grab a short subtitle: strip the number/offer part, keep the rest as context
   let subtitle = raw
     .replace(/(\d{1,3})\s?%\s?off/i, "")
-    .replace(/(₦|\$|£|€)\s?[\d,]+\s?off/i, "")
+    .replace(/(Rs |\$|£|€)\s?[\d,]+\s?off/i, "")
     .replace(/buy\s?1\s?get\s?1( free)?/i, "")
     .trim();
   if (!subtitle) subtitle = "Limited time offer";
@@ -885,6 +900,16 @@ function resolveCssColor(value) {
 }
 
 // Simple manual word-wrap for canvas text (canvas has no built-in wrapping).
+// Loads a (base64 or same-origin) image so it can be drawn onto a <canvas>.
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
 function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
   const words = (text || "").split(" ");
   let line = "";
@@ -915,6 +940,22 @@ function AiMarketingSection({ businessName, businessId }) {
   const [showShareModal, setShowShareModal] = useState(false);
   const [selectedPhones, setSelectedPhones] = useState(() => new Set());
   const [queue, setQueue] = useState(null); // { list, idx, sentCount }
+  const [customImage, setCustomImage] = useState(""); // base64 — if set, used instead of the auto-fetched stock photo
+  const customImageInputRef = useRef(null);
+
+  function handleCustomImageUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      alert("Please choose an image under 4MB.");
+      e.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setCustomImage(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
 
   const customerList = lsGet(bKey("mnft_customers", businessId), customers).filter((c) => c.phone);
 
@@ -977,6 +1018,7 @@ function AiMarketingSection({ businessName, businessId }) {
       const caption = buildCaption({ promo, tone, platform, business: businessName });
       const theme = POSTER_THEMES[Math.floor(Math.random() * POSTER_THEMES.length)];
       const category = detectImageCategory(promo.raw);
+      const company = lsGet(bKey("mnft_company_info", businessId), sampleFor(businessId, DEFAULT_COMPANY_INFO, {}));
       setGenerated({
         headline: promo.headline,
         subtitle: promo.subtitle,
@@ -984,7 +1026,8 @@ function AiMarketingSection({ businessName, businessId }) {
         hashtags: buildHashtags(promo),
         bestTime: bestTimeFor(cityIdx, platform, country.tz),
         theme,
-        posterImage: `https://loremflickr.com/800/800/${category}/all?random=${Date.now()}`,
+        posterImage: customImage || `https://loremflickr.com/800/800/${category}/all?random=${Date.now()}`,
+        logo: company.logo || "",
       });
       setLoading(false);
     }, 900);
@@ -1006,12 +1049,23 @@ function AiMarketingSection({ businessName, businessId }) {
     canvas.height = size;
     const ctx = canvas.getContext("2d");
 
-    // Background gradient (same theme as the on-screen preview — always renders, no external-image risk).
+    // Background gradient (always renders, no external-image risk).
     const grad = ctx.createLinearGradient(0, 0, size, size);
     grad.addColorStop(0, resolveCssColor(generated.theme.from));
     grad.addColorStop(1, resolveCssColor(generated.theme.to));
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, size, size);
+
+    // If the person uploaded their own photo (a safe same-origin data URL), bake it into the download too.
+    if (generated.posterImage && generated.posterImage.startsWith("data:")) {
+      try {
+        const photo = await loadImage(generated.posterImage);
+        const scale = Math.max(size / photo.width, size / photo.height);
+        const w = photo.width * scale;
+        const h = photo.height * scale;
+        ctx.drawImage(photo, (size - w) / 2, (size - h) / 2, w, h);
+      } catch {}
+    }
 
     // Soft bottom-heavy dark overlay so text stays legible, matching the preview style.
     const overlay = ctx.createLinearGradient(0, 0, 0, size);
@@ -1023,6 +1077,27 @@ function AiMarketingSection({ businessName, businessId }) {
 
     if (document.fonts && document.fonts.ready) {
       try { await document.fonts.ready; } catch {}
+    }
+
+    if (generated.logo) {
+      try {
+        const logoImg = await loadImage(generated.logo);
+        const logoSize = 96;
+        const cx = size / 2;
+        const cy = size * 0.3;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, logoSize / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(logoImg, cx - logoSize / 2, cy - logoSize / 2, logoSize, logoSize);
+        ctx.restore();
+        ctx.beginPath();
+        ctx.arc(cx, cy, logoSize / 2, 0, Math.PI * 2);
+        ctx.strokeStyle = "rgba(255,255,255,0.85)";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      } catch {}
     }
 
     ctx.textAlign = "center";
@@ -1153,6 +1228,27 @@ function AiMarketingSection({ businessName, businessId }) {
             />
           </div>
 
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--muted)" }}>Photo for the poster (optional)</label>
+            <input ref={customImageInputRef} type="file" accept="image/*" className="hidden" onChange={handleCustomImageUpload} />
+            {customImage ? (
+              <div className="mt-2 flex items-center gap-3">
+                <img src={customImage} alt="Your upload" className="w-14 h-14 rounded-lg object-cover" style={{ border: "1px solid var(--border)" }} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs" style={{ color: "var(--text-dim)" }}>Using your photo instead of a stock image.</p>
+                  <button onClick={() => setCustomImage("")} className="text-xs font-semibold mt-1" style={{ color: "var(--danger)" }}>Remove</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => customImageInputRef.current?.click()} className="btn-ghost w-full mt-2 py-2.5 rounded-xl text-xs font-semibold inline-flex items-center justify-center gap-1.5">
+                <Upload size={13} /> Upload your own photo
+              </button>
+            )}
+            <p className="text-[10px] mt-1.5" style={{ color: "var(--muted)" }}>
+              Skip this and we'll auto-pick a matching stock photo based on what you're promoting.
+            </p>
+          </div>
+
           <button onClick={handleGenerate} disabled={loading || !prompt.trim()} className="btn-primary w-full py-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2" style={{ opacity: !prompt.trim() ? 0.6 : 1 }}>
             <Wand2 size={15} /> {loading ? "Generating…" : "Generate promotion"}
           </button>
@@ -1196,6 +1292,9 @@ function AiMarketingSection({ businessName, businessId }) {
                   />
                   <div className="absolute inset-0" style={{ background: "linear-gradient(185deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.35) 45%, rgba(0,0,0,0.82) 100%)" }} />
                   <div className="relative h-full flex flex-col items-center justify-center text-center p-6">
+                    {generated.logo ? (
+                      <img src={generated.logo} alt="" className="w-11 h-11 rounded-full object-cover mb-2 border-2" style={{ borderColor: "rgba(255,255,255,0.8)" }} />
+                    ) : null}
                     <span className="text-[10px] tracking-widest uppercase text-white/85 mb-2">{businessName}</span>
                     <span className="font-display text-3xl text-white leading-tight" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.5)" }}>{generated.headline}</span>
                     <span className="text-xs text-white/90 mt-3 px-4">{generated.subtitle}</span>
@@ -1418,6 +1517,33 @@ function CustomersSection({ businessId, businessName }) {
   const [list, setList] = usePersistedState(bKey("mnft_customers", businessId), sampleFor(businessId, customers, []));
   const [importMsg, setImportMsg] = useState(null);
   const fileInputRef = useRef(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editForm, setEditForm] = useState(null);
+
+  function openEdit(idx, c) {
+    setEditIndex(idx);
+    setEditForm({ ...c });
+  }
+
+  function updateEdit(field, value) {
+    setEditForm((f) => ({ ...f, [field]: value }));
+  }
+
+  function saveEdit(e) {
+    e.preventDefault();
+    setList((prev) => prev.map((c, i) => (i === editIndex ? { ...editForm, phone: toWaNumber(editForm.phone) } : c)));
+    setEditIndex(null);
+    setEditForm(null);
+    setImportMsg("Customer updated");
+    setTimeout(() => setImportMsg(null), 3000);
+  }
+
+  function deleteCustomer() {
+    if (!window.confirm(`Remove ${editForm.name} from your customer list?`)) return;
+    setList((prev) => prev.filter((_, i) => i !== editIndex));
+    setEditIndex(null);
+    setEditForm(null);
+  }
 
   const filtered = useMemo(
     () => list.filter((c) => c.name.toLowerCase().includes(query.toLowerCase())),
@@ -1460,7 +1586,7 @@ function CustomersSection({ businessId, businessName }) {
               phone,
               tag: "New",
               segment: "Imported",
-              spend: "₦0",
+              spend: "Rs 0",
               visits: 0,
               birthday: "—",
               fav: "—",
@@ -1503,7 +1629,7 @@ function CustomersSection({ businessId, businessName }) {
         phone: toWaNumber(addForm.phone),
         tag: addForm.tag,
         segment: "First Purchase",
-        spend: "₦0",
+        spend: "Rs 0",
         visits: 0,
         birthday: "—",
         fav: "—",
@@ -1578,6 +1704,7 @@ function CustomersSection({ businessId, businessName }) {
                 <th className="px-6 py-3 font-medium">Visits</th>
                 <th className="px-6 py-3 font-medium">Birthday</th>
                 <th className="px-6 py-3 font-medium">Favorite</th>
+                <th className="px-6 py-3 font-medium"></th>
               </tr>
             </thead>
             <tbody>
@@ -1616,6 +1743,9 @@ function CustomersSection({ businessId, businessName }) {
                   <td className="px-6 py-3.5 font-mono text-xs" style={{ color: "var(--text-dim)" }}>{c.visits}</td>
                   <td className="px-6 py-3.5 text-xs" style={{ color: "var(--text-dim)" }}>{c.birthday}</td>
                   <td className="px-6 py-3.5 text-xs" style={{ color: "var(--text-dim)" }}>{c.fav}</td>
+                  <td className="px-6 py-3.5">
+                    <button onClick={() => openEdit(list.indexOf(c), c)} className="btn-ghost px-2.5 py-1.5 rounded-lg text-[11px] font-semibold">Edit</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -1642,6 +1772,51 @@ function CustomersSection({ businessId, businessName }) {
               <span className="text-xs" style={{ color: "var(--text-dim)" }}>Customer agreed to receive marketing messages</span>
             </label>
             <button type="submit" className="btn-primary w-full py-3 rounded-xl text-sm font-semibold mt-2">Add customer</button>
+          </form>
+        </Modal>
+      )}
+
+      {editForm && (
+        <Modal title="Edit Customer" subtitle="Update this customer's details." onClose={() => { setEditIndex(null); setEditForm(null); }}>
+          <form onSubmit={saveEdit}>
+            <Field label="Full name">
+              <input autoFocus value={editForm.name} onChange={(e) => updateEdit("name", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
+            </Field>
+            <Field label="WhatsApp number">
+              <input value={editForm.phone} onChange={(e) => updateEdit("phone", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
+            </Field>
+            <Field label="Tag">
+              <select value={editForm.tag} onChange={(e) => updateEdit("tag", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()}>
+                {["New", "Loyal", "VIP", "At Risk"].map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </Field>
+            <Field label="Segment">
+              <input value={editForm.segment} onChange={(e) => updateEdit("segment", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Total spend">
+                <input value={editForm.spend} onChange={(e) => updateEdit("spend", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
+              </Field>
+              <Field label="Visits">
+                <input value={editForm.visits} onChange={(e) => updateEdit("visits", Number(e.target.value) || 0)} type="number" className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
+              </Field>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Birthday">
+                <input value={editForm.birthday} onChange={(e) => updateEdit("birthday", e.target.value)} placeholder="e.g. Aug 14" className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
+              </Field>
+              <Field label="Favorite item">
+                <input value={editForm.fav} onChange={(e) => updateEdit("fav", e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
+              </Field>
+            </div>
+            <label className="flex items-center gap-2.5 mb-3.5 cursor-pointer">
+              <input type="checkbox" checked={editForm.consent !== false} onChange={(e) => updateEdit("consent", e.target.checked)} className="w-4 h-4" />
+              <span className="text-xs" style={{ color: "var(--text-dim)" }}>Customer agreed to receive marketing messages</span>
+            </label>
+            <div className="flex gap-2 mt-2">
+              <button type="submit" className="btn-primary flex-1 py-3 rounded-xl text-sm font-semibold">Save changes</button>
+              <button type="button" onClick={deleteCustomer} className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold" style={{ color: "var(--danger)" }}><Trash2 size={14} /></button>
+            </div>
           </form>
         </Modal>
       )}
@@ -1734,7 +1909,7 @@ function PromotionsSection({ businessId }) {
           </div>
           <div className="card-soft p-4">
             <div className="flex justify-between text-xs mb-2" style={{ color: "var(--muted)" }}>
-              <span>Cashback paid out (30d)</span><span className="font-mono" style={{ color: "var(--text)" }}>₦312,000</span>
+              <span>Cashback paid out (30d)</span><span className="font-mono" style={{ color: "var(--text)" }}>Rs 312,000</span>
             </div>
             <div className="progress-track h-2"><div className="progress-fill h-2" style={{ width: "48%" }} /></div>
           </div>
@@ -2081,10 +2256,10 @@ function ReferralsSection({ businessId }) {
       const rewardAmount = parseInt(form.reward || "1000", 10) || 1000;
       if (existing) {
         return prev
-          .map((l) => (l === existing ? { ...l, invites: l.invites + 1, rewardEarned: `₦${(parseInt(l.rewardEarned.replace(/[^\d]/g, ""), 10) + rewardAmount).toLocaleString()}` } : l))
+          .map((l) => (l === existing ? { ...l, invites: l.invites + 1, rewardEarned: `Rs ${(parseInt(l.rewardEarned.replace(/[^\d]/g, ""), 10) + rewardAmount).toLocaleString()}` } : l))
           .sort((a, b) => b.invites - a.invites);
       }
-      return [...prev, { name: form.name.trim(), invites: 1, rewardEarned: `₦${rewardAmount.toLocaleString()}` }].sort((a, b) => b.invites - a.invites);
+      return [...prev, { name: form.name.trim(), invites: 1, rewardEarned: `Rs ${rewardAmount.toLocaleString()}` }].sort((a, b) => b.invites - a.invites);
     });
     setShowModal(false);
     setToast(`Referral logged for ${form.name.trim()}`);
@@ -2113,7 +2288,7 @@ function ReferralsSection({ businessId }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="card p-6">
           <h3 className="font-display text-lg mb-1">Your Referral Program</h3>
-          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Reward: ₦1,000 credit for both sides</p>
+          <p className="text-xs mb-4" style={{ color: "var(--muted)" }}>Reward: Rs 1,000 credit for both sides</p>
           <div className="card-soft p-4 flex items-center justify-between mb-3">
             <span className="font-mono text-sm truncate" style={{ color: "var(--text)" }}>{referralLink}</span>
             <button onClick={handleCopy} className="btn-ghost px-2.5 py-1.5 rounded-md text-[11px] inline-flex items-center gap-1 shrink-0">
@@ -2126,7 +2301,7 @@ function ReferralsSection({ businessId }) {
               <div className="text-[10px]" style={{ color: "var(--muted)" }}>Total invites</div>
             </div>
             <div className="card-soft p-3 text-center">
-              <div className="font-display text-xl">₦{totalRewards >= 1000 ? `${Math.round(totalRewards / 1000)}K` : totalRewards}</div>
+              <div className="font-display text-xl">Rs {totalRewards >= 1000 ? `${Math.round(totalRewards / 1000)}K` : totalRewards}</div>
               <div className="text-[10px]" style={{ color: "var(--muted)" }}>Rewards paid</div>
             </div>
           </div>
@@ -2161,7 +2336,7 @@ function ReferralsSection({ businessId }) {
             <Field label="Referring customer">
               <input autoFocus value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="e.g. Amara Okafor" className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
             </Field>
-            <Field label="Reward amount (₦)">
+            <Field label="Reward amount (Rs )">
               <input value={form.reward} onChange={(e) => setForm((f) => ({ ...f, reward: e.target.value }))} placeholder="1000" className="w-full px-3.5 py-2.5 rounded-xl text-sm outline-none" style={inputStyle()} />
             </Field>
             <button type="submit" className="btn-primary w-full py-3 rounded-xl text-sm font-semibold mt-2">Log referral</button>
@@ -2185,7 +2360,7 @@ function AnalyticsSection({ businessId, businessName }) {
   ];
   const roiCards = isDefaultBusiness
     ? [
-        { label: "Marketing ROI", value: "4.6x", note: "₦1 spent → ₦4.60 generated" },
+        { label: "Marketing ROI", value: "4.6x", note: "Rs 1 spent → Rs 4.60 generated" },
         { label: "Repeat Customer Rate", value: "62%", note: "Up from 54% last quarter" },
         { label: "Avg. Conversion Rate", value: "5.1%", note: "Across all campaigns" },
       ]
@@ -2266,7 +2441,7 @@ function AnalyticsSection({ businessId, businessName }) {
 }
 
 function buildAssistantSystemPrompt(businessName) {
-  return `You are the MNFT Growth AI assistant, embedded inside a business-growth dashboard for "${businessName || "the business"}". You help the business owner with marketing ideas, customer retention, promotions, and interpreting their numbers. Their current snapshot: 8,412 total customers, 612 new this month (+12.4%), 1,080 returning (+6.9%), ₦4.82M revenue from promotions (+18.3%), 4.8★ Google rating (412 reviews, +61 this month), 1,904 coupons used, 214 customers inactive 21+ days (win-back risk). Be specific, concise, and practical — like a sharp marketing consultant, not a generic chatbot. Keep replies under ~120 words unless asked for detail. Use Nigerian Naira (₦) when discussing money.`;
+  return `You are the MNFT Growth AI assistant, embedded inside a business-growth dashboard for "${businessName || "the business"}". You help the business owner with marketing ideas, customer retention, promotions, and interpreting their numbers. Their current snapshot: 8,412 total customers, 612 new this month (+12.4%), 1,080 returning (+6.9%), Rs 4.82M revenue from promotions (+18.3%), 4.8★ Google rating (412 reviews, +61 this month), 1,904 coupons used, 214 customers inactive 21+ days (win-back risk). Be specific, concise, and practical — like a sharp marketing consultant, not a generic chatbot. Keep replies under ~120 words unless asked for detail. Use Pakistani Rupees (Rs) when discussing money.`;
 }
 
 function AssistantSection({ businessId, businessName }) {
@@ -2419,7 +2594,7 @@ function buildReportRows(reportName) {
     ["Total Customers", "8,412"],
     ["New Customers (period)", "612"],
     ["Returning Customers", "1,080"],
-    ["Revenue from Promotions", "₦4,820,000"],
+    ["Revenue from Promotions", "Rs 4,820,000"],
     ["Google Review Rating", "4.8 (412 reviews)"],
     ["Coupon Usage", "1,904"],
     ["Marketing ROI", "4.6x"],
@@ -3133,8 +3308,9 @@ function ReportsSection() {
 const DEFAULT_COMPANY_INFO = {
   name: "Riverside Café",
   type: "Café & Restaurant",
-  phone: "+234 803 555 0192",
-  email: "hello@riversidecafe.ng",
+  phone: "+92 300 1234567",
+  email: "hello@riversidecafe.com",
+  logo: "",
 };
 const DEFAULT_BRANCHES = [
   { name: "Riverside Café — Lekki", hours: "7:00 AM – 10:00 PM" },
@@ -3144,7 +3320,7 @@ const DEFAULT_BRANCHES = [
 const DEFAULT_NOTIFICATION_PREFS = { whatsapp: true, sms: false, email: true, push: true, inApp: true };
 
 function SettingsSection({ referralEnabled, onToggleReferrals, isAuthor, businessId, businesses, onAddBusiness, onRemoveBusiness, onSwitchBusiness, onRenameBusiness }) {
-  const emptyCompanyFor = (id, name) => ({ name: name || "New Business", type: "", phone: "", email: "" });
+  const emptyCompanyFor = (id, name) => ({ name: name || "New Business", type: "", phone: "", email: "", logo: "" });
   const [company, setCompany] = useState(() => lsGet(bKey("mnft_company_info", businessId), sampleFor(businessId, DEFAULT_COMPANY_INFO, emptyCompanyFor(businessId))));
   const [googleLink, setGoogleLink] = useState(() => lsGet(bKey("mnft_google_review_link", businessId), sampleFor(businessId, DEFAULT_GOOGLE_REVIEW_LINK, "")));
   const [branches, setBranches] = useState(() => lsGet(bKey("mnft_branches", businessId), sampleFor(businessId, DEFAULT_BRANCHES, [])));
@@ -3167,6 +3343,21 @@ function SettingsSection({ referralEnabled, onToggleReferrals, isAuthor, busines
 
   function updateCompany(field, value) {
     setCompany((c) => ({ ...c, [field]: value }));
+  }
+
+  const logoInputRef = useRef(null);
+  function handleLogoUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 1024 * 1024) {
+      alert("Please choose an image under 1MB.");
+      e.target.value = "";
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => updateCompany("logo", reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = "";
   }
 
   function toggleNotif(channel) {
@@ -3261,10 +3452,15 @@ function SettingsSection({ referralEnabled, onToggleReferrals, isAuthor, busines
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div className="card p-6 flex flex-col items-center text-center">
-          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4" style={{ background: "linear-gradient(135deg, var(--accent), var(--gold))" }}>
-            <Store size={28} color="#fff" />
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4 overflow-hidden" style={{ background: company.logo ? "var(--surface-2)" : "linear-gradient(135deg, var(--accent), var(--gold))" }}>
+            {company.logo ? <img src={company.logo} alt="Logo" className="w-full h-full object-cover" /> : <Store size={28} color="#fff" />}
           </div>
-          <button className="btn-ghost px-3 py-1.5 rounded-lg text-xs font-semibold">Upload Logo</button>
+          <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+          <div className="flex gap-2">
+            <button onClick={() => logoInputRef.current?.click()} className="btn-ghost px-3 py-1.5 rounded-lg text-xs font-semibold">Upload Logo</button>
+            {company.logo && <button onClick={() => updateCompany("logo", "")} className="btn-ghost px-3 py-1.5 rounded-lg text-xs font-semibold" style={{ color: "var(--danger)" }}>Remove</button>}
+          </div>
+          <p className="text-[10px] mt-2" style={{ color: "var(--muted)" }}>Shows on AI-generated posters automatically.</p>
           <div className="w-full mt-6 space-y-3 text-left">
             {["Instagram", "Facebook", "TikTok", "WhatsApp"].map((s) => (
               <div key={s} className="flex items-center justify-between text-xs">
